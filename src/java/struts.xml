@@ -1,0 +1,173 @@
+<!DOCTYPE struts PUBLIC
+"-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+"http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+    <!-- Configuration for the default package. -->
+    
+    <package name="default" extends="struts-default" namespace="/">
+        
+        <global-results>
+            <result name="error" type="redirect">invalid</result>
+            <result name="login" type="redirect">home</result>
+        </global-results>
+        <action name="invalid">
+            <result>invalid.html</result>
+        </action>
+        <action name="">
+            <result type="chain">home</result>
+        </action>
+        <action name="view-request" class="hienht.actions.ViewRequestDetailAction">
+            <result>view-request-detail.jsp</result>
+        </action>
+    </package>
+    <package name="logged-in" extends="struts-default" namespace="/">
+        <global-results>
+            <result name="login" type="redirect">login</result>
+        </global-results>
+        <action name="logout" class="hienht.actions.LogoutAction">
+            <result type="redirect">login</result>
+        </action>
+        <action name="home" class="hienht.actions.GoHomeAction">
+            <result>home.jsp</result>
+        </action>
+        <action name="search" class="hienht.actions.SearchDeviceAction">
+            <result type="chain">home</result>
+        </action>
+        
+    </package>
+    <package name="guest" extends="struts-default" namespace="/">
+        
+        <interceptors>
+            <interceptor name="beforeLogin" class="hienht.interceptors.BeforeLoginInterceptor" />
+            <interceptor-stack name="beforeLoginStack">
+                <interceptor-ref name="beforeLogin" />
+                <interceptor-ref name="defaultStack"/>
+            </interceptor-stack>
+        </interceptors>
+        <default-interceptor-ref name="beforeLoginStack"></default-interceptor-ref>
+        <global-results>
+            <result name="error" type="redirect">invalid.html</result>
+            <result name="login" type="redirect">home</result>
+        </global-results>
+        
+        
+        <global-exception-mappings>
+             <exception-mapping exception = "java.lang.Exception" result = "error" />
+        </global-exception-mappings>
+        
+        <action name="login">
+            <result>login.jsp</result>
+        </action>
+        <action name="register">
+            <result>register.jsp</result>
+        </action>
+        <action name="login-with-google" class="hienht.actions.LoginWithGoogleAction">
+            <result type="redirect">home</result>
+        </action>
+        
+        <action name="logged-user-in" class="hienht.actions.LoginAction">
+            <result type="redirect">home</result>
+            <result name="login">login.jsp</result>
+        </action>
+        <action name="send-email" class="hienht.actions.SendMailAction">
+            <result>verify-email.jsp</result>
+        </action>
+        <action name="register-user" class="hienht.actions.RegisterAction">
+            <result type="chain">send-email</result>
+            <result name="input">register.jsp</result>
+        </action>
+        <action name="verify-email" class="hienht.actions.VerifyEmailAction">
+            <result>success-register.html</result>
+            <result name="error">verify-email.jsp</result>
+        </action>
+    </package>
+    
+    <package name="user" extends="struts-default" namespace="/">
+        <interceptors>
+            <interceptor name="userAuth" class="hienht.interceptors.UserAuthInterceptor" />
+            <interceptor-stack name="userAuthStack">
+                <interceptor-ref name="userAuth" />
+                <interceptor-ref name="defaultStack"/>
+            </interceptor-stack>
+        </interceptors>
+        <default-interceptor-ref name="userAuthStack"></default-interceptor-ref>
+        <global-results>
+            <result name="login" type="redirect">home</result>
+        </global-results>
+        <action name="search-request-user" class="hienht.actions.SearchRequestUser">
+            <result>request-history.jsp</result>
+            <result type="redirect" name="error">invalid</result>
+            <result type="redirect" name="none">request-history</result>
+        </action>
+        <action name="delete-request-user" class="hienht.actions.DeleteRequestUserAction">
+            <result type="redirect">request-history</result>
+            <result name="error" type="redirect">invalid</result>
+        </action>
+        <action name="booking" class="hienht.actions.BookingAction">
+            <result type="redirect">${redirectUrl}</result>
+        </action>
+        <action name="change-booking-date" class="hienht.actions.ChangeBookingDateAction">
+            <result type="redirect">view-booking</result>
+            <result name="error" type="redirect">invalid</result>
+            <result name="input" type="redirect">view-booking</result>
+        </action>
+        <action name="remove-item" class="hienht.actions.RemoveItemAction">
+            <result type="redirect">view-booking</result>
+            <result name="error" type="redirect">invalid</result>
+        </action>
+        <action name="update-item" class="hienht.actions.UpdateItemAction">
+            <result type="redirect">view-booking</result>
+            <result name="error" type="redirect">invalid</result>
+        </action>
+        <action name="view-booking">
+            <result>view-booking.jsp</result>
+        </action>
+        <action name="success-request">
+            <result>success-request.jsp</result>
+        </action>
+        
+        <action name="request-history" class="hienht.actions.ViewRequestHistoryAction">
+            <result>request-history.jsp</result>
+        </action>
+        
+        <action name="send-request" class="hienht.actions.SendRequestAction">
+            <result type="redirect">success-request</result>
+            <result name="error" type="chain">view-booking</result>
+            <result name="input" type="chain">view-booking</result>
+        </action>
+    </package>
+    
+    <package name="admin" extends="struts-default" namespace="/">
+        <interceptors>
+            <interceptor name="adminAuth" class="hienht.interceptors.AdminAuthInterceptor" />
+            <interceptor-stack name="adminAuthStack">
+                <interceptor-ref name="adminAuth" />
+                <interceptor-ref name="defaultStack"/>
+            </interceptor-stack>
+        </interceptors>
+        <default-interceptor-ref name="adminAuthStack"></default-interceptor-ref>
+        <global-results>
+            <result name="login" type="redirect">home</result>
+        </global-results>
+        <action name="get-all-status" class="hienht.actions.GetAllStatusAction">
+            <result>view-request-admin.jsp</result>
+        </action>
+        <action name="view-request-admin" class="hienht.actions.ViewRequestAdminAction">
+            <result type="chain">get-all-status</result>
+        </action>
+        <action name="search-request-admin" class="hienht.actions.SearchRequestAdminAction">
+            <result type="chain">get-all-status</result>
+        </action>
+        <action name="delete-request-admin" class="hienht.actions.DeleteRequestAdminAction">
+            <result type="redirect">view-request-admin</result>
+            <result name="error" type="redirect">invalid.html</result>
+        </action>
+        <action name="approve-request" class="hienht.actions.AcceptRequestAction">
+            <result type="redirect">view-request-admin</result>
+            <result name="fail" type="chain">get-all-status</result>
+            <result name="error" type="redirect">invalid.html</result>
+        </action>
+        
+    </package>
+</struts>
